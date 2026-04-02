@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Muhammad Ashik S — Electronics Engineer</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --c:#00f5ff;--g:#39ff14;--o:#ff6b35;--p:#bf5fff;
+  --bg:#030d1a;--bg2:rgba(0,18,36,0.92);
+  --dim:#4a7a95;--border:rgba(0,245,255,0.18);
+  --txt:#dff2ff;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--txt);overflow-x:hidden;cursor:none}
+
+/* ── CURSOR ── */
+#CUR,#DOT{position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:transform .15s}
+#CUR{width:22px;height:22px;border:1.5px solid var(--c);border-radius:50%;mix-blend-mode:screen}
+#DOT{width:5px;height:5px;background:var(--c);border-radius:50%}
+
+/* ── LAUNCH SCREEN ── */
+#launch{
+  position:fixed;inset:0;z-index:8000;
+  background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+#launch canvas{position:absolute;inset:0;width:100%;height:100%}
+.launch-inner{position:relative;z-index:2;text-align:center}
+.launch-tag{
+  font-family:'Share Tech Mono',monospace;font-size:.72rem;letter-spacing:4px;
+  color:var(--g);border:1px solid var(--g);padding:5px 16px;border-radius:2px;
+  display:inline-block;margin-bottom:32px;
+  animation:tagPulse 2s ease-in-out infinite;
+}
+@keyframes tagPulse{0%,100%{box-shadow:0 0 10px rgba(57,255,20,.1)}50%{box-shadow:0 0 30px rgba(57,255,20,.4)}}
+.launch-name{
+  font-family:'Orbitron',sans-serif;font-size:clamp(2.5rem,8vw,6rem);font-weight:900;
+  background:linear-gradient(135deg,#fff 0%,var(--c) 55%,var(--o) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  line-height:1;margin-bottom:16px;
+}
+.launch-sub{
+  font-family:'Rajdhani',sans-serif;font-size:clamp(.9rem,2vw,1.3rem);font-weight:500;
+  letter-spacing:4px;color:var(--dim);margin-bottom:56px;
+}
+.launch-sub span{color:var(--c)}
+.launch-btn{
+  font-family:'Orbitron',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:3px;
+  padding:16px 48px;border-radius:2px;cursor:none;
+  background:transparent;border:1px solid var(--c);color:var(--c);
+  position:relative;overflow:hidden;transition:color .4s;
+  animation:btnAppear 1.5s ease-out .8s both;
+}
+@keyframes btnAppear{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.launch-btn::before{
+  content:'';position:absolute;inset:0;
+  background:var(--c);transform:translateX(-101%);transition:transform .4s;z-index:-1;
+}
+.launch-btn:hover::before{transform:translateX(0)}
+.launch-btn:hover{color:var(--bg)}
+.launch-ring{
+  position:absolute;border-radius:50%;border:1px solid rgba(0,245,255,.08);
+  animation:expand 5s ease-out infinite;
+}
+@keyframes expand{0%{transform:scale(0);opacity:.6}100%{transform:scale(4);opacity:0}}
+
+/* ── MAIN ── */
+#main{opacity:0;pointer-events:none;transition:opacity .8s}
+#main.show{opacity:1;pointer-events:all}
+
+/* ── SHARED CANVAS LAYER ── */
+#bgcanvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:linear-gradient(rgba(0,245,255,.05) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,245,255,.05) 1px,transparent 1px);
+  background-size:60px 60px;z-index:0;pointer-events:none;
+}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;width:100%;
+  background:rgba(3,13,26,.92);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);z-index:100;
+  display:flex;align-items:center;justify-content:space-between;padding:14px 52px;
+}
+.nlogo{font-family:'Orbitron',sans-serif;font-size:1.1rem;font-weight:700;color:var(--c);letter-spacing:3px;text-shadow:0 0 20px var(--c)}
+.nlinks{display:flex;gap:28px;list-style:none}
+.nlinks a{font-family:'Share Tech Mono',monospace;font-size:.8rem;color:var(--dim);text-decoration:none;letter-spacing:1px;transition:color .2s,text-shadow .2s}
+.nlinks a:hover{color:var(--c);text-shadow:0 0 10px var(--c)}
+
+/* ── SECTIONS ── */
+section{position:relative;z-index:1}
+.wrap{padding:100px 52px;max-width:1200px;margin:0 auto}
+
+.slabel{font-family:'Share Tech Mono',monospace;font-size:.7rem;letter-spacing:4px;color:var(--o);margin-bottom:8px}
+.stitle{font-family:'Orbitron',sans-serif;font-size:clamp(1.6rem,3vw,2.6rem);font-weight:700;margin-bottom:48px;position:relative;display:inline-block}
+.stitle::after{content:'';position:absolute;bottom:-8px;left:0;height:3px;width:50px;background:linear-gradient(90deg,var(--c),transparent)}
+
+/* ── HERO ── */
+#hero{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:120px 52px 80px;text-align:center}
+.hbadge{font-family:'Share Tech Mono',monospace;font-size:.72rem;letter-spacing:4px;color:var(--g);border:1px solid var(--g);padding:5px 16px;border-radius:2px;display:inline-block;margin-bottom:28px;text-shadow:0 0 8px var(--g)}
+.hname{font-family:'Orbitron',sans-serif;font-size:clamp(2.8rem,7vw,5.5rem);font-weight:900;line-height:1.05;background:linear-gradient(135deg,#fff 0%,var(--c) 50%,var(--o) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:rise 1s ease-out}
+.htitle{font-size:clamp(1rem,2vw,1.4rem);font-weight:500;letter-spacing:3px;color:var(--dim);margin:10px 0 20px}
+.htitle span{color:var(--c)}
+.hdesc{max-width:600px;margin:0 auto 36px;font-size:1.05rem;line-height:1.8;color:rgba(223,242,255,.7)}
+@keyframes rise{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.hbtns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.btn{font-family:'Orbitron',sans-serif;font-size:.75rem;font-weight:700;letter-spacing:2px;padding:14px 32px;border-radius:2px;text-decoration:none;transition:all .3s;cursor:none;position:relative;overflow:hidden}
+.btn-p{background:var(--c);color:var(--bg);box-shadow:0 0 24px rgba(0,245,255,.4)}
+.btn-p:hover{box-shadow:0 0 48px rgba(0,245,255,.9);transform:translateY(-2px)}
+.btn-o{border:1px solid var(--c);color:var(--c)}
+.btn-o:hover{background:var(--c);color:var(--bg)}
+.hstats{display:flex;gap:40px;justify-content:center;margin-top:52px;flex-wrap:wrap}
+.sv{font-family:'Orbitron',sans-serif;font-size:2.2rem;font-weight:700;color:var(--c);text-shadow:0 0 20px var(--c)}
+.sl{font-family:'Share Tech Mono',monospace;font-size:.68rem;letter-spacing:2px;color:var(--dim);margin-top:4px}
+.sdiv{width:1px;background:var(--border)}
+
+/* ── ABOUT ── */
+#about{background:rgba(0,25,45,.35)}
+.agrid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+.aphoto{position:relative;width:280px;height:340px;margin:0 auto}
+.aphoto img{width:100%;height:100%;object-fit:cover;object-position:top;border-radius:4px;filter:contrast(1.1)}
+.aphborder{position:absolute;inset:-12px;border:2px solid var(--c);border-radius:4px;animation:borderG 3s ease-in-out infinite}
+@keyframes borderG{0%,100%{box-shadow:0 0 20px rgba(0,245,255,.15)}50%{box-shadow:0 0 40px rgba(0,245,255,.45)}}
+.apc{position:absolute;width:18px;height:18px;border-color:var(--o);border-style:solid}
+.apc.tl{top:-4px;left:-4px;border-width:3px 0 0 3px}
+.apc.tr{top:-4px;right:-4px;border-width:3px 3px 0 0}
+.apc.bl{bottom:-4px;left:-4px;border-width:0 0 3px 3px}
+.apc.br{bottom:-4px;right:-4px;border-width:0 3px 3px 0}
+.apscan{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--c),transparent);animation:scan 3s linear infinite}
+@keyframes scan{from{top:0}to{top:100%}}
+.atext p{font-size:1.05rem;line-height:1.85;color:rgba(223,242,255,.8);margin-bottom:14px}
+.igrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:24px}
+.iitem{background:rgba(0,20,40,.8);border:1px solid var(--border);padding:12px 16px;border-radius:2px}
+.ilbl{font-family:'Share Tech Mono',monospace;font-size:.65rem;letter-spacing:2px;color:var(--o)}
+.ival{font-size:.95rem;font-weight:600;margin-top:2px}
+
+/* ── HACKATHONS ── */
+#hackathons{background:rgba(0,15,30,.4)}
+.hk-timeline{position:relative;padding-left:40px}
+.hk-timeline::before{content:'';position:absolute;left:14px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--c),var(--p),var(--o),transparent)}
+.hk-item{position:relative;margin-bottom:36px}
+.hk-dot{position:absolute;left:-34px;top:18px;width:14px;height:14px;border-radius:50%;border:2px solid var(--c);background:var(--bg);box-shadow:0 0 12px var(--c)}
+.hk-dot.win{border-color:var(--g);box-shadow:0 0 12px var(--g)}
+.hk-dot.fin{border-color:var(--o);box-shadow:0 0 12px var(--o)}
+.hk-card{background:rgba(0,20,38,.9);border:1px solid var(--border);border-radius:2px;padding:26px 28px;position:relative;overflow:hidden;transition:all .35s}
+.hk-card:hover{border-color:var(--c);transform:translateX(6px);box-shadow:0 0 30px rgba(0,245,255,.12)}
+.hk-card::before{content:'';position:absolute;top:0;right:0;width:120px;height:120px;background:radial-gradient(circle,rgba(0,245,255,.05),transparent 70%)}
+.hk-badge{display:inline-flex;align-items:center;gap:8px;font-family:'Share Tech Mono',monospace;font-size:.68rem;letter-spacing:2px;padding:4px 12px;border-radius:2px;margin-bottom:12px}
+.hk-badge.win{background:rgba(57,255,20,.08);border:1px solid rgba(57,255,20,.3);color:var(--g)}
+.hk-badge.fin{background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.3);color:var(--o)}
+.hk-badge.par{background:rgba(0,245,255,.07);border:1px solid rgba(0,245,255,.25);color:var(--c)}
+.hk-name{font-family:'Orbitron',sans-serif;font-size:1.05rem;font-weight:700;margin-bottom:6px}
+.hk-role{font-family:'Share Tech Mono',monospace;font-size:.72rem;letter-spacing:2px;color:var(--p);margin-bottom:10px}
+.hk-desc{font-size:.95rem;line-height:1.7;color:var(--dim)}
+.hk-proj{margin-top:12px;font-size:.9rem;color:rgba(223,242,255,.7)}
+.hk-proj span{color:var(--c);font-weight:600}
+.hk-year{position:absolute;right:24px;top:24px;font-family:'Orbitron',sans-serif;font-size:.85rem;color:var(--dim)}
+
+/* ── PROJECTS ── */
+.pgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:22px}
+.pcard{background:rgba(0,20,38,.9);border:1px solid var(--border);border-radius:2px;padding:30px;position:relative;overflow:hidden;transition:all .35s}
+.pcard:hover{border-color:var(--c);transform:translateY(-6px);box-shadow:0 16px 48px rgba(0,245,255,.12)}
+.pcard::after{content:'';position:absolute;top:-40px;right:-40px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(0,245,255,.06),transparent);transition:transform .5s}
+.pcard:hover::after{transform:scale(3)}
+.pnum{font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--o);letter-spacing:3px;margin-bottom:10px}
+.ptitle{font-family:'Orbitron',sans-serif;font-size:1rem;font-weight:700;margin-bottom:12px;line-height:1.4}
+.pdesc{font-size:.93rem;line-height:1.75;color:var(--dim)}
+.ptag{display:inline-block;margin-top:16px;font-family:'Share Tech Mono',monospace;font-size:.65rem;letter-spacing:2px;padding:4px 12px;border-radius:2px;background:rgba(57,255,20,.07);border:1px solid rgba(57,255,20,.25);color:var(--g)}
+
+/* ── SKILLS ── */
+#skills{background:rgba(0,15,28,.3)}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:18px}
+.scard{background:rgba(0,20,38,.9);border:1px solid var(--border);padding:26px 20px;border-radius:2px;text-align:center;transition:all .3s}
+.scard:hover{border-color:var(--c);box-shadow:0 0 28px rgba(0,245,255,.15);transform:translateY(-4px)}
+.sico{font-size:2.2rem;margin-bottom:10px}
+.sname{font-family:'Orbitron',sans-serif;font-size:.82rem;font-weight:600;color:var(--c);letter-spacing:1px}
+.sbar{background:rgba(0,245,255,.07);height:3px;border-radius:2px;margin-top:10px;overflow:hidden}
+.sbfill{height:100%;background:linear-gradient(90deg,var(--c),var(--g));border-radius:2px;animation:bfill 2s ease-out forwards}
+@keyframes bfill{from{width:0}}
+
+/* ── CERTS ── */
+#certs{background:rgba(0,20,38,.2)}
+.clist{display:flex;flex-direction:column;gap:14px}
+.citem{background:rgba(0,20,38,.9);border:1px solid var(--border);border-radius:2px;padding:18px 26px;display:flex;align-items:center;gap:18px;transition:all .3s}
+.citem:hover{border-left:4px solid var(--o);transform:translateX(5px)}
+.cico{width:42px;height:42px;background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.25);border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.cname{font-size:1rem;font-weight:600}
+.ciss{font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--dim);letter-spacing:1px;margin-top:3px}
+.cyr{font-family:'Orbitron',sans-serif;font-size:.82rem;color:var(--c);margin-left:auto;flex-shrink:0}
+
+/* ── EDUCATION ── */
+.ecard{background:rgba(0,20,38,.9);border:1px solid var(--border);border-left:4px solid var(--c);padding:30px 36px;border-radius:2px;position:relative;overflow:hidden;transition:all .3s}
+.ecard:hover{box-shadow:0 16px 48px rgba(0,245,255,.1);transform:translateY(-3px)}
+.ecard::before{content:'';position:absolute;top:0;right:0;width:160px;height:160px;background:radial-gradient(circle,rgba(0,245,255,.05),transparent 70%)}
+.edeg{font-family:'Orbitron',sans-serif;font-size:1.25rem;font-weight:700;color:var(--c)}
+.esc{font-size:1.1rem;font-weight:600;margin:8px 0 4px}
+.emeta{font-family:'Share Tech Mono',monospace;font-size:.75rem;color:var(--dim);letter-spacing:1px}
+.egpa{display:flex;gap:28px;flex-wrap:wrap;margin-top:20px}
+.gbox{background:rgba(0,245,255,.04);border:1px solid rgba(0,245,255,.18);padding:10px 18px;border-radius:2px}
+.gv{font-family:'Orbitron',sans-serif;font-size:1.5rem;font-weight:700;color:var(--g);text-shadow:0 0 12px var(--g)}
+.gl{font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--dim);letter-spacing:2px}
+
+/* ── LEADERSHIP ── */
+.lgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+.lcard{background:rgba(0,20,38,.9);border:1px solid var(--border);padding:26px;border-radius:2px;text-align:center;transition:all .3s}
+.lcard:hover{border-color:var(--o);box-shadow:0 0 28px rgba(255,107,53,.12)}
+.lico{font-size:2.4rem;margin-bottom:12px}
+.lrole{font-family:'Orbitron',sans-serif;font-size:.9rem;font-weight:700;color:var(--o);margin-bottom:6px}
+.lorg{font-size:.95rem;color:var(--dim)}
+
+/* ── CONTACT ── */
+#contact{background:rgba(0,20,38,.35);border-top:1px solid var(--border)}
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start}
+.ccard{background:rgba(0,20,38,.9);border:1px solid var(--border);border-radius:2px;padding:18px;display:flex;align-items:center;gap:14px;margin-bottom:14px;transition:all .3s}
+.ccard:hover{border-color:var(--c);transform:translateX(5px)}
+.ccico{width:42px;height:42px;background:rgba(0,245,255,.07);border:1px solid rgba(0,245,255,.2);border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.cclink{color:var(--c);text-decoration:none;font-size:.93rem;word-break:break-all}
+.cclink:hover{text-decoration:underline}
+.cclbl{font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--dim);letter-spacing:1px}
+
+/* ── FOOTER ── */
+footer{text-align:center;padding:28px;font-family:'Share Tech Mono',monospace;font-size:.68rem;letter-spacing:2px;color:var(--dim);border-top:1px solid var(--border);position:relative;z-index:1}
+footer span{color:var(--c)}
+
+/* ── REVEAL ── */
+.rev{opacity:0;transform:translateY(28px);transition:opacity .7s,transform .7s}
+.rev.vis{opacity:1;transform:translateY(0)}
+
+/* ── LAUNCH EXIT ── */
+#launch.out{animation:launchOut .9s ease-in forwards}
+@keyframes launchOut{to{opacity:0;transform:scale(1.04);pointer-events:none}}
+
+@media(max-width:768px){
+  nav{padding:12px 20px}.nlinks{display:none}
+  .wrap{padding:80px 20px}
+  .agrid,.cgrid{grid-template-columns:1fr}
+  #hero{padding:120px 20px 80px}
+  .hstats{gap:20px}.sdiv{display:none}
+}
+</style>
+</head>
+<body>
+<div id="CUR"></div>
+<div id="DOT"></div>
+
+<!-- ═══════════════════════════════════════════ LAUNCH SCREEN -->
+<div id="launch">
+  <canvas id="lcanvas"></canvas>
+  <!-- decorative rings -->
+  <div class="launch-ring" style="width:400px;height:400px;animation-delay:0s"></div>
+  <div class="launch-ring" style="width:600px;height:600px;animation-delay:1.2s"></div>
+  <div class="launch-ring" style="width:800px;height:800px;animation-delay:2.4s"></div>
+  <div class="launch-inner">
+    <div class="launch-tag">// ELECTRONICS &amp; IOT ENGINEER — PORTFOLIO v2.0</div>
+    <h1 class="launch-name">MUHAMMAD<br>ASHIK S</h1>
+    <p class="launch-sub">B.E. EIE · <span>Sri Sairam Engineering College</span> · Chennai</p>
+    <button class="launch-btn" id="launchBtn" onclick="launchSite()">⚡ LAUNCH PORTFOLIO</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ MAIN SITE -->
+<div id="main">
+<canvas id="bgcanvas"></canvas>
+
+<!-- NAV -->
+<nav>
+  <div class="nlogo">M.ASHIK</div>
+  <ul class="nlinks">
+    <li><a href="#about">ABOUT</a></li>
+    <li><a href="#hackathons">HACKATHONS</a></li>
+    <li><a href="#projects">PROJECTS</a></li>
+    <li><a href="#skills">SKILLS</a></li>
+    <li><a href="#certs">CERTS</a></li>
+    <li><a href="#education">EDU</a></li>
+    <li><a href="#contact">CONTACT</a></li>
+  </ul>
+</nav>
+
+<!-- ── HERO -->
+<section id="hero">
+  <div style="max-width:900px">
+    <div class="hbadge">// ELECTRONICS &amp; INSTRUMENTATION · EMBEDDED · IOT</div>
+    <h1 class="hname">MUHAMMAD<br>ASHIK S</h1>
+    <p class="htitle">Team Lead · <span>INNOVORTEX</span> · Hackathon Competitor</p>
+    <p class="hdesc">Electronics engineer, hackathon leader &amp; embedded systems innovator building intelligent circuits and IoT solutions that solve real-world problems.</p>
+    <div class="hbtns">
+      <a href="#hackathons" class="btn btn-p">HACKATHON JOURNEY</a>
+      <a href="#contact" class="btn btn-o">CONNECT WITH ME</a>
+    </div>
+    <div class="hstats">
+      <div><div class="sv">8.55</div><div class="sl">GPA</div></div>
+      <div class="sdiv"></div>
+      <div><div class="sv">8.33</div><div class="sl">CGPA</div></div>
+      <div class="sdiv"></div>
+      <div><div class="sv">6+</div><div class="sl">HACKATHONS</div></div>
+      <div class="sdiv"></div>
+      <div><div class="sv">4+</div><div class="sl">PROJECTS LED</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── ABOUT -->
+<section id="about">
+<div class="wrap">
+  <div class="agrid rev">
+    <div class="aphoto">
+      <img src="/mnt/user-data/uploads/1775110641473_WhatsApp_Image_2026-04-02_at_11_46_55_AM.jpeg" alt="Muhammad Ashik S"/>
+      <div class="aphborder"></div>
+      <div class="apc tl"></div><div class="apc tr"></div>
+      <div class="apc bl"></div><div class="apc br"></div>
+      <div class="apscan"></div>
+    </div>
+    <div class="atext">
+      <div class="slabel">// 01 — PROFILE</div>
+      <h2 class="stitle">About Me</h2>
+      <p>I'm a passionate <strong style="color:var(--c)">Electronics &amp; Instrumentation Engineering</strong> student at Sri Sairam Engineering College, Chennai — specialising in embedded systems, IoT, and hardware-software integration.</p>
+      <p>As Team Lead of <strong style="color:var(--o)">INNOVORTEX</strong>, I drive teams to build innovative solutions at national hackathons, having participated and led projects in SIH2025, YUVA Hacks, Build2Gether, Hackathon League 2025, and more.</p>
+      <p>I bridge electronics hardware with intelligent software — from smart agricultural sensors to ergonomics AI — always as the person steering the team.</p>
+      <div class="igrid">
+        <div class="iitem"><div class="ilbl">DATE OF BIRTH</div><div class="ival">22 July 2007</div></div>
+        <div class="iitem"><div class="ilbl">LOCATION</div><div class="ival">Chennai, India</div></div>
+        <div class="iitem"><div class="ilbl">LANGUAGES</div><div class="ival">English · Tamil</div></div>
+        <div class="iitem"><div class="ilbl">FOCUS AREA</div><div class="ival">Embedded &amp; IoT</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ── HACKATHONS (HIGHLIGHT SECTION) -->
+<section id="hackathons">
+<div class="wrap">
+  <div class="rev">
+    <div class="slabel">// 02 — COMPETITIVE RECORD</div>
+    <h2 class="stitle">Hackathon Journey</h2>
+  </div>
+
+  <!-- 3D Circuit SVG decoration -->
+  <div style="text-align:center;margin-bottom:48px" class="rev">
+    <svg viewBox="0 0 700 80" width="100%" style="max-width:700px;opacity:.5">
+      <line x1="0" y1="40" x2="700" y2="40" stroke="var(--c)" stroke-width=".8" stroke-dasharray="4,8"/>
+      <circle cx="80" cy="40" r="5" fill="none" stroke="var(--c)" stroke-width="1.2"/>
+      <circle cx="80" cy="40" r="2" fill="var(--c)"/>
+      <line x1="80" y1="40" x2="80" y2="12" stroke="var(--c)" stroke-width=".8"/>
+      <rect x="68" y="4" width="24" height="8" rx="2" fill="none" stroke="var(--o)" stroke-width="1"/>
+      <circle cx="210" cy="40" r="5" fill="none" stroke="var(--g)" stroke-width="1.2"/>
+      <circle cx="210" cy="40" r="2" fill="var(--g)"/>
+      <line x1="210" y1="40" x2="210" y2="68" stroke="var(--g)" stroke-width=".8"/>
+      <rect x="198" y="68" width="24" height="8" rx="2" fill="none" stroke="var(--g)" stroke-width="1"/>
+      <circle cx="350" cy="40" r="8" fill="none" stroke="var(--c)" stroke-width="1.5"/>
+      <circle cx="350" cy="40" r="4" fill="var(--c)"/>
+      <circle cx="490" cy="40" r="5" fill="none" stroke="var(--p)" stroke-width="1.2"/>
+      <circle cx="490" cy="40" r="2" fill="var(--p)"/>
+      <line x1="490" y1="40" x2="490" y2="12" stroke="var(--p)" stroke-width=".8"/>
+      <rect x="478" y="4" width="24" height="8" rx="2" fill="none" stroke="var(--p)" stroke-width="1"/>
+      <circle cx="620" cy="40" r="5" fill="none" stroke="var(--o)" stroke-width="1.2"/>
+      <circle cx="620" cy="40" r="2" fill="var(--o)"/>
+      <line x1="620" y1="40" x2="620" y2="68" stroke="var(--o)" stroke-width=".8"/>
+      <rect x="608" y="68" width="24" height="8" rx="2" fill="none" stroke="var(--o)" stroke-width="1"/>
+    </svg>
+  </div>
+
+  <div class="hk-timeline">
+
+    <!-- SIH 2025 — Smart Electric Fence -->
+    <div class="hk-item rev">
+      <div class="hk-dot win"></div>
+      <div class="hk-card">
+        <div class="hk-year">2025</div>
+        <div class="hk-badge win">★ FINALIST — SIH GRAND FINALE</div>
+        <div class="hk-name">Smart India Hackathon 2025 — Hardware Edition</div>
+        <div class="hk-role">⚡ TEAM LEAD · TEAM INNOVORTEX</div>
+        <div class="hk-desc">India's most prestigious student hackathon organised by the Government of India. Competed among thousands of teams from across the nation in the hardware category — one of the toughest categories requiring physical prototyping and embedded engineering.</div>
+        <div class="hk-proj">Project: <span>Smart Electric Fence Using Embedded System</span> — Intelligent perimeter security for agriculture &amp; critical infrastructure with real-time intrusion detection and alert mechanisms.</div>
+      </div>
+    </div>
+
+    <!-- SIH 2025 — Smart Onion Storage -->
+    <div class="hk-item rev">
+      <div class="hk-dot win"></div>
+      <div class="hk-card">
+        <div class="hk-year">2025</div>
+        <div class="hk-badge win">★ FINALIST — SIH GRAND FINALE</div>
+        <div class="hk-name">Smart India Hackathon 2025 — Second Submission</div>
+        <div class="hk-role">⚡ TEAM LEAD · TEAM INNOVORTEX</div>
+        <div class="hk-desc">Led a second parallel project submission to SIH 2025 — a rare achievement of leading two distinct technical projects through the same national hackathon simultaneously.</div>
+        <div class="hk-proj">Project: <span>Smart Onion Storage System</span> — IoT-driven post-harvest storage with temperature, humidity &amp; gas monitoring to minimize agricultural losses.</div>
+      </div>
+    </div>
+
+    <!-- YUVA Hacks -->
+    <div class="hk-item rev">
+      <div class="hk-dot fin"></div>
+      <div class="hk-card">
+        <div class="hk-year">2025</div>
+        <div class="hk-badge fin">▲ TEAM LEAD</div>
+        <div class="hk-name">YUVA Hacks — Innovation Hackathon</div>
+        <div class="hk-role">⚡ TEAM LEAD · TEAM INNOVORTEX</div>
+        <div class="hk-desc">A competitive youth-focused innovation hackathon bringing together multidisciplinary engineering teams to tackle health, productivity, and technology challenges in a time-bounded environment.</div>
+        <div class="hk-proj">Project: <span>Posture &amp; Ergonomics Detection</span> — Computer vision + sensor fusion system that analyzes real-time posture to alert users of ergonomic risks and workplace health issues.</div>
+      </div>
+    </div>
+
+    <!-- Hackathon League 2025 -->
+    <div class="hk-item rev">
+      <div class="hk-dot par"></div>
+      <div class="hk-card">
+        <div class="hk-year">2025</div>
+        <div class="hk-badge par">◆ PARTICIPANT · TEAM LEAD</div>
+        <div class="hk-name">Hackathon League 2025 — Learnathon</div>
+        <div class="hk-role">⚡ TEAM LEAD · TEAM INNOVORTEX</div>
+        <div class="hk-desc">Organised by Sri Sairam Engineering College &amp; Sri Sairam Institute of Technology in collaboration with GUVI &amp; HCL Technologies — a multi-round hackathon league with industry evaluation and mentorship.</div>
+        <div class="hk-proj">Led INNOVORTEX through the league rounds, applying embedded systems and IoT expertise in a competitive collaborative environment with industry partner evaluation.</div>
+      </div>
+    </div>
+
+    <!-- Build2Gether -->
+    <div class="hk-item rev">
+      <div class="hk-dot par"></div>
+      <div class="hk-card">
+        <div class="hk-year">2026</div>
+        <div class="hk-badge par">◆ PARTICIPANT · TEAM LEAD</div>
+        <div class="hk-name">BUILD2GETHER — International AI SDG Hackathon</div>
+        <div class="hk-role">⚡ TEAM LEAD · TEAM INNOVORTEX</div>
+        <div class="hk-desc">A flagship international hackathon organised in association with <strong style="color:var(--c)">ETH Zürich</strong> and <strong style="color:var(--c)">Nanyang Technological University, Singapore</strong>. Part of Sairam SDG Inspirathon 3.0 — developing AI-driven solutions aligned with the UN's 17 Sustainable Development Goals.</div>
+        <div class="hk-proj">Led team to build AI-powered solutions addressing global sustainability challenges at an internationally-evaluated event with institutions from Switzerland and Singapore.</div>
+      </div>
+    </div>
+
+    <!-- SIH Internal — SaiHackFest -->
+    <div class="hk-item rev">
+      <div class="hk-dot fin"></div>
+      <div class="hk-card">
+        <div class="hk-year">2025</div>
+        <div class="hk-badge fin">▲ TEAM LEAD · INTERNAL QUALIFIER</div>
+        <div class="hk-name">SaiHackFest — SIH Internal Hackathon 2025</div>
+        <div class="hk-role">⚡ TEAM LEAD · TEAM INNOVORTEX</div>
+        <div class="hk-desc">Sri Sairam Institutions' internal Smart India Hackathon qualifier. Competed successfully through the internal rounds to advance to the national SIH Grand Finale — demonstrating consistent competitive performance.</div>
+        <div class="hk-proj">Qualified through multiple rounds of internal evaluation to represent Sri Sairam Engineering College at the national stage.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Legend -->
+  <div class="rev" style="display:flex;gap:24px;flex-wrap:wrap;margin-top:36px;padding-left:40px">
+    <div style="display:flex;align-items:center;gap:8px"><div style="width:12px;height:12px;border-radius:50%;background:var(--g);box-shadow:0 0 8px var(--g)"></div><span style="font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--dim);letter-spacing:1px">GRAND FINALIST</span></div>
+    <div style="display:flex;align-items:center;gap:8px"><div style="width:12px;height:12px;border-radius:50%;background:var(--o);box-shadow:0 0 8px var(--o)"></div><span style="font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--dim);letter-spacing:1px">TEAM LEAD</span></div>
+    <div style="display:flex;align-items:center;gap:8px"><div style="width:12px;height:12px;border-radius:50%;background:var(--c);box-shadow:0 0 8px var(--c)"></div><span style="font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--dim);letter-spacing:1px">PARTICIPANT · LEAD</span></div>
+  </div>
+</div>
+</section>
+
+<!-- ── PROJECTS -->
+<section id="projects">
+<div class="wrap">
+  <div class="rev">
+    <div class="slabel">// 03 — BUILD LOG</div>
+    <h2 class="stitle">Projects</h2>
+  </div>
+  <div class="pgrid">
+    <div class="pcard rev">
+      <div class="pnum">PROJECT_01 · SIH2025 · HARDWARE</div>
+      <div class="ptitle">Smart Electric Fence — Embedded System</div>
+      <div class="pdesc">Intelligent perimeter system using embedded microcontrollers to detect intrusions, trigger real-time alerts, and ensure safety for agricultural fields and infrastructure zones.</div>
+      <span class="ptag">TEAM LEAD · EMBEDDED · SENSORS</span>
+    </div>
+    <div class="pcard rev">
+      <div class="pnum">PROJECT_02 · SIH2025 · IoT</div>
+      <div class="ptitle">Smart Onion Storage System</div>
+      <div class="pdesc">IoT post-harvest monitoring system tracking temperature, humidity, and gas concentrations to intelligently manage storage conditions and reduce agricultural waste.</div>
+      <span class="ptag">TEAM LEAD · IoT · AGRICULTURE</span>
+    </div>
+    <div class="pcard rev">
+      <div class="pnum">PROJECT_03 · YUVA HACKS · AI+HW</div>
+      <div class="ptitle">Posture &amp; Ergonomics Detection</div>
+      <div class="pdesc">Real-time system combining computer vision and physical sensors to analyze body posture, detecting ergonomic risks and alerting users before long-term health damage occurs.</div>
+      <span class="ptag">TEAM LEAD · CV · SENSORS · HEALTH</span>
+    </div>
+    <div class="pcard rev" style="border-color:rgba(191,95,255,.2)">
+      <div class="pnum" style="color:var(--p)">PROJECT_04 · IN PROGRESS</div>
+      <div class="ptitle" style="color:var(--p)">Next-Gen Embedded IoT System</div>
+      <div class="pdesc">Currently engineering an advanced system bridging embedded intelligence with cloud-connected IoT capabilities — autonomous sensing, edge computing, real-time decision-making.</div>
+      <span class="ptag" style="color:var(--p);border-color:rgba(191,95,255,.3);background:rgba(191,95,255,.07)">ACTIVE · EMBEDDED · IoT · EDGE AI</span>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ── SKILLS -->
+<section id="skills">
+<div class="wrap">
+  <div class="rev">
+    <div class="slabel">// 04 — CAPABILITIES</div>
+    <h2 class="stitle">Technical Skills</h2>
+  </div>
+  <div class="sgrid">
+    <div class="scard rev"><div class="sico">🔌</div><div class="sname">Embedded Systems</div><div class="sbar"><div class="sbfill" style="width:92%"></div></div></div>
+    <div class="scard rev"><div class="sico">📡</div><div class="sname">IoT &amp; Sensors</div><div class="sbar"><div class="sbfill" style="width:87%"></div></div></div>
+    <div class="scard rev"><div class="sico">🌐</div><div class="sname">Web Development</div><div class="sbar"><div class="sbfill" style="width:80%"></div></div></div>
+    <div class="scard rev"><div class="sico">💡</div><div class="sname">Critical Thinking</div><div class="sbar"><div class="sbfill" style="width:94%"></div></div></div>
+    <div class="scard rev"><div class="sico">🧩</div><div class="sname">Problem Solving</div><div class="sbar"><div class="sbfill" style="width:90%"></div></div></div>
+    <div class="scard rev"><div class="sico">👨‍💻</div><div class="sname">Programming</div><div class="sbar"><div class="sbfill" style="width:83%"></div></div></div>
+    <div class="scard rev"><div class="sico">🏆</div><div class="sname">Team Leadership</div><div class="sbar"><div class="sbfill" style="width:96%"></div></div></div>
+    <div class="scard rev"><div class="sico">🗣️</div><div class="sname">Communication</div><div class="sbar"><div class="sbfill" style="width:88%"></div></div></div>
+  </div>
+</div>
+</section>
+
+<!-- ── CERTS -->
+<section id="certs">
+<div class="wrap">
+  <div class="rev">
+    <div class="slabel">// 05 — CREDENTIALS</div>
+    <h2 class="stitle">Certifications &amp; Achievements</h2>
+  </div>
+  <div class="clist">
+    <div class="citem rev"><div class="cico">🏦</div><div><div class="cname">JP Morgan Software Engineering Job Simulation</div><div class="ciss">JPMORGAN CHASE &amp; CO. · FORAGE PLATFORM</div></div><div class="cyr">2025</div></div>
+    <div class="citem rev"><div class="cico">🌐</div><div><div class="cname">Master Course in Web Development</div><div class="ciss">GREAT LEARNING</div></div><div class="cyr">2024</div></div>
+    <div class="citem rev"><div class="cico">🔧</div><div><div class="cname">Embedded Systems Internship — IPCS Global Industries</div><div class="ciss">INDUSTRY INTERNSHIP CERTIFICATE · COMPLETED</div></div><div class="cyr">Jul 2025</div></div>
+    <div class="citem rev"><div class="cico">💻</div><div><div class="cname">Programming Languages &amp; Embedded Courses</div><div class="ciss">MULTIPLE CERTIFIED PLATFORMS</div></div><div class="cyr">2024–25</div></div>
+    <div class="citem rev"><div class="cico">🏅</div><div><div class="cname">SIH 2025 Grand Finale — Two Projects as Team Lead</div><div class="ciss">SMART INDIA HACKATHON · GOVERNMENT OF INDIA</div></div><div class="cyr">2025</div></div>
+    <div class="citem rev"><div class="cico">🌍</div><div><div class="cname">BUILD2GETHER International AI SDG Hackathon</div><div class="ciss">ETH ZÜRICH · NTU SINGAPORE · SAIRAM SDG INSPIRATHON 3.0</div></div><div class="cyr">2026</div></div>
+  </div>
+</div>
+</section>
+
+<!-- ── EDUCATION -->
+<section id="education">
+<div class="wrap">
+  <div class="rev">
+    <div class="slabel">// 06 — ACADEMICS</div>
+    <h2 class="stitle">Education</h2>
+  </div>
+  <div class="ecard rev">
+    <div class="edeg">B.E. Electronics &amp; Instrumentation Engineering (EIE)</div>
+    <div class="esc">Sri Sairam Engineering College, Chennai, India</div>
+    <div class="emeta">Expected Graduation: May 2028 · Sairam Institutions · Autonomous Institution</div>
+    <div class="egpa">
+      <div class="gbox"><div class="gv">8.55</div><div class="gl">CURRENT GPA</div></div>
+      <div class="gbox"><div class="gv">8.33</div><div class="gl">CGPA</div></div>
+    </div>
+    <p style="margin-top:18px;color:var(--dim);font-size:.93rem">Internship: <strong style="color:var(--c)">Embedded Systems</strong> — IPCS Global Industries · Completed July 2025</p>
+  </div>
+  <div style="margin-top:28px" class="rev">
+    <div class="lgrid">
+      <div class="lcard"><div class="lico">⚡</div><div class="lrole">TEAM LEAD</div><div class="lorg">Team INNOVORTEX</div></div>
+      <div class="lcard"><div class="lico">🏛️</div><div class="lrole">DEPARTMENT HEAD</div><div class="lorg">YUCI — Youth United for Creative Innovation</div></div>
+      <div class="lcard"><div class="lico">🚀</div><div class="lrole">MULTI-HACKATHON LEADER</div><div class="lorg">SIH · YUVA Hacks · Build2Gether · Hackathon League</div></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ── CONTACT -->
+<section id="contact">
+<div class="wrap">
+  <div class="cgrid">
+    <div class="rev">
+      <div class="slabel">// 07 — REACH OUT</div>
+      <h2 class="stitle">Let's Connect</h2>
+      <p style="color:var(--dim);line-height:1.85;font-size:1rem;margin-top:-20px">Open to collaborations, hackathon teams, internship opportunities, and interesting projects in electronics, IoT, and embedded systems.</p>
+    </div>
+    <div class="rev">
+      <div class="ccard"><div class="ccico">📧</div><div><div class="cclbl">EMAIL</div><a href="mailto:sec24ei017@sairamatap.edu.in" class="cclink">sec24ei017@sairamatap.edu.in</a></div></div>
+      <div class="ccard"><div class="ccico">📱</div><div><div class="cclbl">MOBILE</div><a href="tel:9489706572" class="cclink">+91 9489706572</a></div></div>
+      <div class="ccard"><div class="ccico">🔗</div><div><div class="cclbl">LINKEDIN</div><a href="https://www.linkedin.com/in/muhammad-ashik-a0a417328" target="_blank" class="cclink">linkedin.com/in/muhammad-ashik</a></div></div>
+      <div class="ccard"><div class="ccico">📍</div><div><div class="cclbl">LOCATION</div><span style="font-size:.93rem">Chennai, India 600012</span></div></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<footer>
+  Built for <span>Muhammad Ashik S</span> &nbsp;·&nbsp; Electronics Engineer &amp; Innovator &nbsp;·&nbsp; <span>© 2026</span>
+</footer>
+</div><!-- /main -->
+
+<script>
+/* ── CURSOR ── */
+const C=document.getElementById('CUR'),D=document.getElementById('DOT');
+document.addEventListener('mousemove',e=>{C.style.left=e.clientX+'px';C.style.top=e.clientY+'px';D.style.left=e.clientX+'px';D.style.top=e.clientY+'px'});
+document.querySelectorAll('a,button,.pcard,.scard,.citem,.hk-card').forEach(el=>{
+  el.addEventListener('mouseenter',()=>C.style.transform='translate(-50%,-50%) scale(2)');
+  el.addEventListener('mouseleave',()=>C.style.transform='translate(-50%,-50%) scale(1)');
+});
+
+/* ── LAUNCH CANVAS (3D CIRCUIT BOARD) ── */
+(function(){
+  const cv=document.getElementById('lcanvas');
+  const ctx=cv.getContext('2d');
+  function resize(){cv.width=window.innerWidth;cv.height=window.innerHeight}
+  resize();window.addEventListener('resize',resize);
+
+  const nodes=[];const wires=[];
+  const colors=['#00f5ff','#39ff14','#ff6b35','#bf5fff','#00f5ff'];
+
+  for(let i=0;i<60;i++){
+    nodes.push({x:Math.random()*cv.width,y:Math.random()*cv.height,r:1+Math.random()*2.5,c:colors[Math.floor(Math.random()*colors.length)],pulse:Math.random()*Math.PI*2,speed:.01+Math.random()*.02});
+  }
+  for(let i=0;i<80;i++){
+    const n1=nodes[Math.floor(Math.random()*nodes.length)];
+    const n2=nodes[Math.floor(Math.random()*nodes.length)];
+    if(Math.abs(n1.x-n2.x)+Math.abs(n1.y-n2.y)<300){
+      wires.push({x1:n1.x,y1:n1.y,x2:n2.x,y2:n2.y,c:n1.c,progress:0,speed:.004+Math.random()*.008,active:Math.random()>.5});
+    }
+  }
+
+  // IC chips
+  const chips=[];
+  for(let i=0;i<12;i++){
+    chips.push({x:Math.random()*cv.width,y:Math.random()*cv.height,w:40+Math.random()*30,h:20+Math.random()*16,c:colors[Math.floor(Math.random()*colors.length)],alpha:.06+Math.random()*.08});
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    // dark gradient bg
+    const grd=ctx.createRadialGradient(cv.width/2,cv.height/2,0,cv.width/2,cv.height/2,cv.width*.7);
+    grd.addColorStop(0,'rgba(0,30,55,.6)');grd.addColorStop(1,'rgba(3,13,26,.95)');
+    ctx.fillStyle=grd;ctx.fillRect(0,0,cv.width,cv.height);
+
+    // chips
+    chips.forEach(ch=>{
+      ctx.strokeStyle=ch.c;ctx.lineWidth=.6;ctx.globalAlpha=ch.alpha;
+      ctx.strokeRect(ch.x,ch.y,ch.w,ch.h);
+      // pins
+      for(let p=0;p<4;p++){
+        ctx.beginPath();ctx.moveTo(ch.x+6+p*8,ch.y);ctx.lineTo(ch.x+6+p*8,ch.y-6);ctx.stroke();
+        ctx.beginPath();ctx.moveTo(ch.x+6+p*8,ch.y+ch.h);ctx.lineTo(ch.x+6+p*8,ch.y+ch.h+6);ctx.stroke();
+      }
+      ctx.globalAlpha=1;
+    });
+
+    // wires
+    wires.forEach(w=>{
+      if(w.active){
+        w.progress=Math.min(1,w.progress+w.speed);
+        ctx.beginPath();
+        ctx.moveTo(w.x1,w.y1);
+        // orthogonal routing
+        const mx=w.x1+(w.x2-w.x1)*w.progress;
+        ctx.lineTo(mx,w.y1);
+        if(w.progress>0.5)ctx.lineTo(mx,w.y2);
+        ctx.strokeStyle=w.c;ctx.lineWidth=.7;ctx.globalAlpha=.25;ctx.stroke();ctx.globalAlpha=1;
+        // traveling pulse
+        const px=w.x1+(w.x2-w.x1)*w.progress;
+        const py=w.y1+(w.y2-w.y1)*w.progress;
+        ctx.beginPath();ctx.arc(px,py,2.5,0,Math.PI*2);ctx.fillStyle=w.c;ctx.globalAlpha=.9;ctx.fill();ctx.globalAlpha=1;
+        if(w.progress>=1){w.progress=0;w.active=Math.random()>.3;}
+      }else{
+        if(Math.random()>.996)w.active=true;
+      }
+    });
+
+    // nodes
+    nodes.forEach(n=>{
+      n.pulse+=n.speed;
+      const a=.4+.4*Math.sin(n.pulse);
+      ctx.beginPath();ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+      ctx.fillStyle=n.c;ctx.globalAlpha=a;ctx.fill();ctx.globalAlpha=1;
+      // glow ring on some
+      if(n.r>2){
+        ctx.beginPath();ctx.arc(n.x,n.y,n.r+4,0,Math.PI*2);
+        ctx.strokeStyle=n.c;ctx.lineWidth=.5;ctx.globalAlpha=a*.3;ctx.stroke();ctx.globalAlpha=1;
+      }
+    });
+
+    // center glow
+    const cg=ctx.createRadialGradient(cv.width/2,cv.height/2,0,cv.width/2,cv.height/2,200);
+    cg.addColorStop(0,'rgba(0,245,255,.04)');cg.addColorStop(1,'transparent');
+    ctx.fillStyle=cg;ctx.fillRect(0,0,cv.width,cv.height);
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ── LAUNCH ── */
+function launchSite(){
+  const launch=document.getElementById('launch');
+  const main=document.getElementById('main');
+  launch.classList.add('out');
+  setTimeout(()=>{
+    launch.style.display='none';
+    main.classList.add('show');
+    startBgCanvas();
+  },900);
+}
+
+/* ── BG CANVAS (main site background circuit) ── */
+function startBgCanvas(){
+  const cv=document.getElementById('bgcanvas');
+  const ctx=cv.getContext('2d');
+  cv.width=window.innerWidth;cv.height=document.body.scrollHeight;
+  window.addEventListener('resize',()=>{cv.width=window.innerWidth;cv.height=document.body.scrollHeight;drawBg()});
+
+  function drawBg(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    for(let i=0;i<80;i++){
+      const x=Math.random()*cv.width,y=Math.random()*cv.height;
+      const len=60+Math.random()*180;
+      const horiz=Math.random()>.5;
+      ctx.beginPath();
+      ctx.strokeStyle=`rgba(0,245,255,${.02+Math.random()*.04})`;ctx.lineWidth=.8;
+      if(horiz){ctx.moveTo(x,y);ctx.lineTo(x+len,y);if(Math.random()>.5){ctx.moveTo(x+len,y);ctx.lineTo(x+len,y+(Math.random()>.5?1:-1)*(20+Math.random()*60));}}
+      else{ctx.moveTo(x,y);ctx.lineTo(x,y+len);if(Math.random()>.5){ctx.moveTo(x,y+len);ctx.lineTo(x+(Math.random()>.5?1:-1)*(20+Math.random()*60),y+len);}}
+      ctx.stroke();
+      if(Math.random()>.6){ctx.beginPath();ctx.arc(x+(horiz?len:0),y+(horiz?0:len),2,0,Math.PI*2);ctx.fillStyle=`rgba(0,245,255,${.1+Math.random()*.2})`;ctx.fill();}
+    }
+  }
+  drawBg();
+}
+
+/* ── SCROLL REVEAL ── */
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis')});
+},{threshold:.1});
+document.querySelectorAll('.rev').forEach(el=>observer.observe(el));
+</script>
+</body>
+</html>
